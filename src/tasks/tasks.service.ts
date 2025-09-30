@@ -31,9 +31,7 @@ export class TasksService {
     return 'Task has been deleted';
   }
   updateTask(id: string, status: string): string {
-    const taskUpdation: Task | undefined = this.tasks.find(
-      (data) => data.id === id,
-    );
+    const taskUpdation = this.getTaskById(id);
     if (taskUpdation) {
       if (status.includes('open')) {
         taskUpdation.status = TaskStatus.OPEN;
