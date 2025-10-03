@@ -22,7 +22,7 @@ export class TasksService {
       title,
       description,
     });
-    return this.tasksRepository.save(task);
+    return await this.tasksRepository.save(task);
   }
 
   async getTaskById(id: string): Promise<Task> {
