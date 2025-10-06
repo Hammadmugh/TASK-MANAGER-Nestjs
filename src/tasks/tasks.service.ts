@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreatTaskDto } from './dto/create-task.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { Task, TaskStatus } from './task.entity';
+import { User } from 'src/auth/entities/auth.entity';
 
 @Injectable()
 export class TasksService {
@@ -12,23 +13,24 @@ export class TasksService {
     private tasksRepository: Repository<Task>,
   ) {}
 
-  async getalltasks(): Promise<Task[]> {
-    return this.tasksRepository.find();
+  async getalltasks(user: User): Promise<Task[]> {
+    return this.tasksRepository.find({ where: { user } });
   }
 
-  async createtask(createTaskDto: CreatTaskDto): Promise<Task> {
+  async createtask(createTaskDto: CreatTaskDto, user: User): Promise<Task> {
     const { title, description } = createTaskDto;
     const task = this.tasksRepository.create({
       title,
       description,
+      user,
     });
     return await this.tasksRepository.save(task);
   }
 
-  async getTaskById(id: string): Promise<Task> {
-    const task = await this.tasksRepository.findOneBy({ id });
+  async getTaskById(id: string, user: User): Promise<Task> {
+    const task = await this.tasksRepository.findOneBy({ id, user });
     if (!task) {
-      throw new NotFoundException(`Task with ID "${id}" not found`);
+      throw new NotFoundException();
     }
     return task;
   }
@@ -36,16 +38,17 @@ export class TasksService {
   async deleteTaskById(id: string): Promise<string> {
     const result = await this.tasksRepository.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException(`Task with ID "${id}" not found`);
+      throw new NotFoundException();
     }
     return 'Task has been deleted';
   }
 
   async updateTask(
     id: string,
+    user: User,
     updateDto: UpdateTaskStatusDto,
   ): Promise<string> {
-    const task = await this.getTaskById(id);
+    const task = await this.getTaskById(id, user);
     task.status = updateDto.status;
     await this.tasksRepository.save(task);
     return 'Task updated successfully.';
