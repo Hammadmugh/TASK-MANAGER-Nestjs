@@ -20,7 +20,7 @@ import { Logger } from '@nestjs/common';
 @Controller('task')
 @UseGuards(AuthGuard())
 export class TasksController {
-  private logger = new Logger('Taskscontroller');
+  private logger = new Logger('TasksController');
   constructor(private tasksService: TasksService) {}
   @Get()
   getalltasks(@GetUser() user: User): Promise<Task[]> {
